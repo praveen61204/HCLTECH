@@ -2,30 +2,37 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Load image
-img = cv2.imread('D:/personal/OneDrive/Documents/HCL/Imageprocessing/Dataset/automobile/Big Truck/Image_000002.jpg')
-gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+# Step 1: Read the industrial image
+# Example: A sample metallic or machinery image
+img = cv2.imread('industrial_sample.jpg', cv2.IMREAD_GRAYSCALE)
 
-# Step 1: Gaussian Blur to reduce noise
-blur = cv2.GaussianBlur(gray, (5,5), 0)
+# Step 2: Apply Sobel Edge Detection
+sobel_x = cv2.Sobel(img, cv2.CV_64F, 1, 0, ksize=3)   # X direction
+sobel_y = cv2.Sobel(img, cv2.CV_64F, 0, 1, ksize=3)   # Y direction
 
-# --- Sobel Edge Detection ---
-sobelx = cv2.Sobel(blur, cv2.CV_64F, 1, 0, ksize=3)
-sobely = cv2.Sobel(blur, cv2.CV_64F, 0, 1, ksize=3)
-sobel = cv2.magnitude(sobelx, sobely)
-sobel = cv2.convertScaleAbs(sobel)
+# Gradient magnitude
+sobel_combined = cv2.magnitude(sobel_x, sobel_y)
 
-# --- Laplacian Edge Detection ---
-laplacian = cv2.Laplacian(blur, cv2.CV_64F)
-laplacian = cv2.convertScaleAbs(laplacian)
+# Step 3: Apply Canny Edge Detection
+edges_canny = cv2.Canny(img, 100, 200)  # thresholds (lower, upper)
 
-# --- Canny Edge Detection ---
-canny = cv2.Canny(blur, 50, 150)  # thresholds can be tuned
+# Step 4: Display results
+plt.figure(figsize=(12, 6))
 
-# Visualization
-plt.figure(figsize=(14,6))
-plt.subplot(1,4,1); plt.imshow(gray, cmap='gray'); plt.title("Original Gray")
-plt.subplot(1,4,2); plt.imshow(sobel, cmap='gray'); plt.title("Sobel Edges")
-plt.subplot(1,4,3); plt.imshow(laplacian, cmap='gray'); plt.title("Laplacian Edges")
-plt.subplot(1,4,4); plt.imshow(canny, cmap='gray'); plt.title("Canny Edges")
+plt.subplot(1, 3, 1)
+plt.title("Original Image")
+plt.imshow(img, cmap='gray')
+plt.axis('off')
+
+plt.subplot(1, 3, 2)
+plt.title("Sobel Edge Detection")
+plt.imshow(sobel_combined, cmap='gray')
+plt.axis('off')
+
+plt.subplot(1, 3, 3)
+plt.title("Canny Edge Detection")
+plt.imshow(edges_canny, cmap='gray')
+plt.axis('off')
+
+plt.tight_layout()
 plt.show()
